@@ -1,0 +1,6 @@
+[package]
+name = "cpptors"
+version = "0.1.0"
+authors = ["Adrian Taylor <adrian@bromium.com>"]
+
+[dependencies]
