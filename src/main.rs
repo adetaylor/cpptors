@@ -7,6 +7,7 @@ extern crate serde_derive;
 use clap::App;
 use clap::Arg;
 use std::fs::File;
+use std::collections::HashMap;
 
 // TODO abstract out into another file
 #[derive(Deserialize, Debug)]
@@ -17,6 +18,11 @@ struct GccXml {
     features: Vec<CodeFeature>,
 }
 
+trait GetId
+{
+    fn get_id(&self) -> &CodeFeatureId;
+}
+
 #[derive(Debug, Deserialize)]
 enum CodeFeature {
     Namespace(Namespace),
@@ -24,6 +30,18 @@ enum CodeFeature {
     FundamentalType(FundamentalType),
     Variable(Variable),
     File(ZFile)
+}
+
+impl GetId for CodeFeature {
+    fn get_id(&self) -> &CodeFeatureId {
+        match &self {
+            CodeFeature::Namespace(namespace) => &namespace.id,
+            CodeFeature::Function(function) => &function.id,
+            CodeFeature::FundamentalType(fundamental_type) => &fundamental_type.id,
+            CodeFeature::Variable(variable) => &variable.id,
+            CodeFeature::File(file) => &file.id
+        }
+    }
 }
 
 #[derive(Deserialize, Debug)]
@@ -87,6 +105,10 @@ fn main() {
     // TODO: call gccxml directly with output into a temporary file
     let f = File::open(input).unwrap();
     let program: GccXml = serde_xml_rs::deserialize(f).unwrap();
-    println!("Program is: {:?}", program)
-
+    println!("Program is: {:?}", program);
+    let mut feature_by_id = HashMap::new();
+    for x in program.features {
+        feature_by_id.insert(x.get_id().id.clone(), x);
+    }
+    
 }
