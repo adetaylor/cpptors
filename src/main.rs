@@ -8,6 +8,7 @@ use clap::App;
 use clap::Arg;
 use std::fs::File;
 
+// TODO abstract out into another file
 #[derive(Deserialize, Debug)]
 #[serde(rename = "GCC_XML")]
 struct GccXml {
@@ -26,9 +27,15 @@ enum CodeFeature {
 }
 
 #[derive(Deserialize, Debug)]
-struct Namespace {
+struct CodeFeatureId {
     id: String,
-    name: String,
+    name: String
+}
+
+#[derive(Deserialize, Debug)]
+struct Namespace {
+    #[serde(flatten)]
+    id: CodeFeatureId,
     members: String, // TODO, do better
     mangled: String,
     demangled: String
@@ -36,8 +43,8 @@ struct Namespace {
 
 #[derive(Deserialize, Debug)]
 struct Function {
-    id: String,
-    name: String,
+    #[serde(flatten)]
+    id: CodeFeatureId,
     returns: String,
     context: String,
     location: String,
@@ -48,21 +55,21 @@ struct Function {
 
 #[derive(Deserialize, Debug)]
 struct FundamentalType {
-    id: String,
-    name: String
+    #[serde(flatten)]
+    id: CodeFeatureId,
 }
 
 #[derive(Deserialize, Debug)]
 struct Variable {
-    id: String,
-    name: String
+    #[serde(flatten)]
+    id: CodeFeatureId,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename = "File")]
 struct ZFile {
-    id: String,
-    name: String
+    #[serde(flatten)]
+    id: CodeFeatureId,
 }
 
 fn main() {
@@ -77,7 +84,9 @@ fn main() {
        .get_matches();
     let input = matches.value_of("INPUT").unwrap();
     println!("Using input file: {}", input);
+    // TODO: call gccxml directly with output into a temporary file
     let f = File::open(input).unwrap();
     let program: GccXml = serde_xml_rs::deserialize(f).unwrap();
     println!("Program is: {:?}", program)
+
 }
