@@ -5,3 +5,7 @@ authors = ["Adrian Taylor <adrian@bromium.com>"]
 
 [dependencies]
 "clap" = "2.32.0"
+"serde" = "1.0.80"
+"serde_xml" = "0.9.1"
+"serde-xml-rs" = "0.2.1"
+"serde_derive" = "1.0.80"
