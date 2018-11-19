@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<GCC_XML cvs_revision="1.120">
+  <Namespace id="_1" name="::" members="_3 _4 _2 " mangled="_Z2::" demangled="::"/>
+  <Namespace id="_2" name="std" context="_1" members="" mangled="_Z3std" demangled="std"/>
+  <Function id="_3" name="main" returns="_5" context="_1" location="f0:2" file="f0" line="2" endline="0">
+    <body:Dump xmlns:body="http://www.djlauk.de/" version="MB1.0.1">
+      <body:Body >
+        <body:Statement_List >
+          <body:Modify_Expr >
+            <body:Var_Decl id="_6" name="" />
+            <body:Integer_Cst>8</body:Integer_Cst>
+          </body:Modify_Expr>
+          <body:Return_Stmt >
+            <body:Modify_Expr >
+              <body:Result_Decl />
+              <body:Var_Decl id="_6" name="" />
+            </body:Modify_Expr>
+          </body:Return_Stmt>
+          <body:Modify_Expr >
+            <body:Var_Decl id="_6" name="" />
+            <body:Integer_Cst>0</body:Integer_Cst>
+          </body:Modify_Expr>
+          <body:Return_Stmt >
+            <body:Modify_Expr >
+              <body:Result_Decl />
+              <body:Var_Decl id="_6" name="" />
+            </body:Modify_Expr>
+          </body:Return_Stmt>
+        </body:Statement_List>
+      </body:Body>
+    </body:Dump>
+  </Function>
+  <Namespace id="_4" name="__cxxabiv1" context="_1" members="" mangled="_Z10__cxxabiv1" demangled="__cxxabiv1"/>
+  <FundamentalType id="_5" name="int" size="32" align="32"/>
+  <Variable id="_6" name="" type="_5" context="_3" location="f0:3" file="f0" line="3" artificial="1" />
+  <File id="f0" name="test.cpp"/>
+</GCC_XML>
