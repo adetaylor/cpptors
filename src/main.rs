@@ -10,6 +10,7 @@ use clap::Arg;
 use std::fs::File;
 use std::collections::HashMap;
 use std::process::Command;
+use std::path::{Path, PathBuf};
 
 // TODO abstract out into another file
 #[derive(Deserialize, Debug)]
@@ -189,22 +190,25 @@ fn main() {
        .get_matches();
     let input = matches.value_of("INPUT").unwrap();
     println!("Using input file: {}", input);
-    let tmpfile : Option<tempfile::NamedTempFile>;
-    let properfile : Option<File>;
-    let f : &File = if !input.ends_with("xml") {
-        tmpfile = Some(tempfile::NamedTempFile::new().expect("Unable to create temporary file"));
-        let tmpfileref = tmpfile.as_ref().unwrap();
-        let tmp_path = tmpfileref.path().to_str().expect("Invalid temp file name");
-        Command::new("C:\\dev\\rust\\cpptors\\gccxml_cc1plus.exe")
-            .arg(format!("-fxml={}", tmp_path))
-            .arg(input)
-            .output()
-            .expect("Failed to run gccxml");
-        tmpfileref.as_file()
+    let tmpdir : Option<tempfile::TempDir>;
+    let xml_path : PathBuf = if input.ends_with("xml") {
+        Path::new(input).to_path_buf()
     } else {
-        properfile = Some(File::open(input).unwrap());
-        &properfile.as_ref().unwrap()
+        tmpdir = Some(tempfile::tempdir().expect("Failed to create temp dir"));
+        let tmp_path = tmpdir.as_ref().unwrap().path().join("out.xml");
+        {
+            let tmp_path_str = tmp_path.as_path().to_str().expect("Temp path made no sense");
+            let output = Command::new("C:\\dev\\rust\\cpptors\\gccxml_cc1plus.exe")
+                .arg(format!("-fxml={}", tmp_path_str))
+                .arg(input)
+                .output()
+                .expect("Failed to run gccxml");
+            println!("stdout was {:?}", output);
+            println!("XML stored at {}", tmp_path_str);
+        }
+        tmp_path
     };
+    let f = File::open(xml_path).unwrap();
     let program: GccXml = serde_xml_rs::deserialize(f).unwrap();
     println!("Program is: {:?}", program);
     let mut feature_by_id = HashMap::new();
