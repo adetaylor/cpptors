@@ -193,14 +193,14 @@ fn main() {
     let properfile : Option<File>;
     let f : &File = if !input.ends_with("xml") {
         tmpfile = Some(tempfile::NamedTempFile::new().expect("Unable to create temporary file"));
-        let x = tmpfile.as_ref().unwrap();
-        let tmp_path = x.path().to_str().expect("Invalid temp file name");
+        let tmpfileref = tmpfile.as_ref().unwrap();
+        let tmp_path = tmpfileref.path().to_str().expect("Invalid temp file name");
         Command::new("C:\\dev\\rust\\cpptors\\gccxml_cc1plus.exe")
             .arg(format!("-fxml={}", tmp_path))
             .arg(input)
             .output()
             .expect("Failed to run gccxml");
-        tmpfile.as_ref().unwrap().as_file()
+        tmpfileref.as_file()
     } else {
         properfile = Some(File::open(input).unwrap());
         &properfile.as_ref().unwrap()
