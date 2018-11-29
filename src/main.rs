@@ -3,11 +3,13 @@ extern crate serde;
 extern crate serde_xml_rs;
 #[macro_use]
 extern crate serde_derive;
+extern crate tempfile;
 
 use clap::App;
 use clap::Arg;
 use std::fs::File;
 use std::collections::HashMap;
+use std::process::Command;
 
 // TODO abstract out into another file
 #[derive(Deserialize, Debug)]
@@ -187,8 +189,22 @@ fn main() {
        .get_matches();
     let input = matches.value_of("INPUT").unwrap();
     println!("Using input file: {}", input);
-    // TODO: call gccxml directly with output into a temporary file
-    let f = File::open(input).unwrap();
+    let tmpfile : Option<tempfile::NamedTempFile>;
+    let properfile : Option<File>;
+    let f : &File = if !input.ends_with("xml") {
+        tmpfile = Some(tempfile::NamedTempFile::new().expect("Unable to create temporary file"));
+        let x = tmpfile.as_ref().unwrap();
+        let tmp_path = x.path().to_str().expect("Invalid temp file name");
+        Command::new("C:\\dev\\rust\\cpptors\\gccxml_cc1plus.exe")
+            .arg(format!("-fxml={}", tmp_path))
+            .arg(input)
+            .output()
+            .expect("Failed to run gccxml");
+        tmpfile.as_ref().unwrap().as_file()
+    } else {
+        properfile = Some(File::open(input).unwrap());
+        &properfile.as_ref().unwrap()
+    };
     let program: GccXml = serde_xml_rs::deserialize(f).unwrap();
     println!("Program is: {:?}", program);
     let mut feature_by_id = HashMap::new();

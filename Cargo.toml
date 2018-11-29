@@ -9,3 +9,4 @@ authors = ["Adrian Taylor <adrian@bromium.com>"]
 "serde_xml" = "0.9.1"
 "serde-xml-rs" = "0.2.1"
 "serde_derive" = "1.0.80"
+tempfile = "3"
