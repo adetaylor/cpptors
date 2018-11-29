@@ -74,7 +74,7 @@ struct Function {
     line: String,
     endline: String,
     #[serde(rename = "$value")]
-    dump: Dump
+    dump: Option<Dump>
 }
 
 #[derive(Deserialize, Debug)]
@@ -98,7 +98,22 @@ struct ZFile {
 
 #[derive(Deserialize, Debug)]
 struct Dump {
+    version: String,
+    #[serde(rename = "$value")]
+    body: Body
+}
 
+#[derive(Deserialize, Debug)]
+struct Body {
+    #[serde(rename = "$value")]
+    statement_list: StatementList
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename = "Statement_List")]
+struct StatementList {
+    #[serde(rename = "$value")]
+    statements: Vec<Statement>
 }
 
 // Now onto statements which may be found in a body
@@ -122,19 +137,22 @@ enum Expr {
     #[serde(rename = "Integer_Cst")]
     IntegerCst(IntegerCst),
     #[serde(rename = "Modify_Expr")]
-    ModifyExpr(ModifyExpr)
+    ModifyExpr(ModifyExpr),
+    #[serde(rename = "Result_Decl")]
+    ResultDecl(ResultDecl)
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename = "Modify_Expr")]
 struct ModifyExpr {
-    target: Box<Expr>,
-    source: Box<Expr>
+    #[serde(rename = "$value")]
+    operands: Vec<Expr>
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename = "Return_Stmt")]
 struct ReturnStmt {
+    #[serde(rename = "$value")]
     operand: Expr
 }
 
@@ -150,6 +168,11 @@ struct VarDecl {
 struct IntegerCst {
     #[serde(rename = "$value")]
     value: i32
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename = "Result_Decl")]
+struct ResultDecl {
 }
 
 fn main() {
