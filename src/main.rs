@@ -212,8 +212,38 @@ fn main() {
     let program: GccXml = serde_xml_rs::deserialize(f).unwrap();
     println!("Program is: {:?}", program);
     let mut feature_by_id = HashMap::new();
-    for x in program.features {
+    for x in &program.features {
         feature_by_id.insert(x.get_id().clone(), x);
     }
+    for x in &program.features {
+        match x {
+            CodeFeature::Function(f) => dump_function(&f, &feature_by_id),
+            _ => {}
+        }
+    }
+}
 
+fn dump_function(f: &Function, feature_directory : &HashMap<String, &CodeFeature>) {
+    println!("fn {}() -> {}", f.name, dump_type(&feature_directory[&f.returns]));
+    println!("{{");
+    for stmt in f.dump.as_ref().expect("No dump").body.statement_list.statements.iter() {
+        println!("    {}", dump_statement(stmt, feature_directory));
+    }
+    println!("}}");
+}
+
+fn dump_statement<'a>(s: &'a Statement, _feature_directory : &HashMap<String, &CodeFeature>) -> &'a str {
+    match s {
+        Statement::ReturnStmt(_) => "return",
+        _ => ""
+    }
+}
+
+fn dump_type(cf: &CodeFeature) -> &str {
+    match &cf {
+        CodeFeature::FundamentalType(ft) => {
+            &ft.name
+        },
+        _ => ""
+    }
 }
